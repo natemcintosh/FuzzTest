@@ -1,7 +1,7 @@
 using Test
 using FuzzTest
 
-@testset "Conversions" begin
+@testset "Byte Conversions" begin
     b1 = UInt8[0]
     b2 = UInt8[0, 0]
     b4 = UInt8[0, 0, 0, 0]
