@@ -1,25 +1,25 @@
 using Test
 using FuzzTest
 
-@testset "Byte Conversions" begin
-    b1 = UInt8[0]
-    b2 = UInt8[0, 0]
-    b4 = UInt8[0, 0, 0, 0]
-    b8 = UInt8[0, 0, 0, 0, 0, 0, 0, 0]
+@testset "hypotenuse is short" begin
+    # Test that the hypotenuse of a right triangle is shorter than the sum of the two
+    # sides
 
-    @testset "zeros" begin
-        @test as_i8(b1) === Int8(0)
+    # Create the channel from which we'll receive new random values
+    c = Channel()
 
-        @test as_i16(b2) === Int16(0)
-        @test as_u16(b2) === UInt16(0)
-        @test as_f16(b2) === Float16(0)
+    # Start the task of generating new random inputs
+    @async mutation_engine(c, 3.14, 5.6)
 
-        @test as_i32(b4) === Int32(0)
-        @test as_u32(b4) === UInt32(0)
-        @test as_f32(b4) === Float32(0)
+    # Generate n random inputs
+    for idx = 1:10_000
+        # Take from the channel, and make the values positive
+        vals = abs.(take!(c))
 
-        @test as_i64(b8) === Int64(0)
-        @test as_u64(b8) === UInt64(0)
-        @test as_f64(b8) === Float64(0)
+        @test hypot(vals[1], vals[2]) < sum(vals)
     end
+end
+
+@testset "non-working types" begin    
+    @test_throws ArgumentError mutation_engine(Channel(), "hello")
 end
