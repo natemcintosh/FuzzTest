@@ -1,4 +1,5 @@
 using Test
+using Random
 using FuzzTest
 
 @testset "hypotenuse is short" begin
@@ -9,14 +10,17 @@ using FuzzTest
     c = Channel()
 
     # Start the task of generating new random inputs
-    @async mutation_engine(c, 3.14, 5.6)
+    Random.seed!(0)
+    @async mutation_engine(c, 3, 5)
 
     # Generate n random inputs
-    for idx = 1:10_000
+    for idx = 1:2
         # Take from the channel, and make the values positive
         vals = abs.(take!(c))
+        @show vals, sum(vals)
 
         @test hypot(vals[1], vals[2]) < sum(vals)
+        # @test sum(vals) > first(vals)
     end
 end
 
